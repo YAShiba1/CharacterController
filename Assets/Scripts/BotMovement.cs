@@ -8,19 +8,28 @@ public class BotMovement : MonoBehaviour
     [SerializeField] private float _minDistanceToPlayer;
     [SerializeField] private float _jumpForce;
     [SerializeField] private float _groundDistance = 0.2f;
+    [SerializeField] private float _stepCheckDistance = 1f;
     [SerializeField] private LayerMask _groundMask;
+    [SerializeField] private LayerMask _stepMask;
 
     private Rigidbody _rigidbody;
     private bool _isGrounded;
+    private bool _canJump;
 
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
     }
 
+    private void FixedUpdate()
+    {
+        Jump();
+    }
+
     private void Update()
     {
         MoveTowardsTarget();
+        CheckStep();
     }
 
     private void MoveTowardsTarget()
@@ -39,16 +48,26 @@ public class BotMovement : MonoBehaviour
         }
     }
 
-    private void Jump()
+    private void CheckStep()
     {
-        _rigidbody.AddForce(Vector3.up * _jumpForce, ForceMode.VelocityChange);
+        _canJump = false;
+
+        RaycastHit hit;
+
+        if (Physics.Raycast(transform.position, Vector3.forward, out hit, _stepCheckDistance, _stepMask))
+        {
+            if (hit.collider.TryGetComponent(out Step step) && transform.position.y < _target.position.y)
+            {
+                _canJump = true;
+            }
+        }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void Jump()
     {
-        if (collision.gameObject.TryGetComponent(out Step step) && transform.position.y < _target.transform.position.y)
+        if (_canJump && _isGrounded)
         {
-            Jump();
+            _rigidbody.AddForce(Vector3.up * _jumpForce, ForceMode.VelocityChange);
         }
     }
 }

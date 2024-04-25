@@ -3,6 +3,9 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
 {
+    private const string HorizontalInputAxis = "Horizontal";
+    private const string VerticalInputAxis = "Vertical";
+
     [SerializeField] private float _speed;
     [SerializeField] private float _jumpSpeed;
 
@@ -21,8 +24,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void Move()
     {
-        float horizontalInput = Input.GetAxisRaw("Horizontal");
-        float verticalInput = Input.GetAxisRaw("Vertical");
+        float horizontalInput = Input.GetAxisRaw(HorizontalInputAxis);
+        float verticalInput = Input.GetAxisRaw(VerticalInputAxis);
 
         if(_characterController.isGrounded)
         {
